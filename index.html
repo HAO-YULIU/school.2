@@ -241,7 +241,7 @@ body.sk #game,body.sk #sc{animation:skk .09s 8}
   <p id="who"></p>
   <p class="tag">你以為這所學校只有學生和老師嗎？</p>
   <div class="cast" id="cast"></div>
-  <div class="rules">🕯 你有 <b>5 個靈魂</b>。答錯太多次、被抓到、做錯選擇都會失去靈魂。<br>💭 小羽的提示分兩段：第一段只給方向（時間 +3 分鐘）；第二段直接給答案（<b>失去 1 個靈魂</b>）。<br>☠ 靈魂用完可以復活，但時間 <b>+10 分鐘</b>。<br>⏱ 建議遊玩時間 <b>200 分鐘</b>，請慢慢玩。<br>☠ 但超過 <b>600 分鐘</b>，一切就會重置。<br>📱 這是一場 ARG：慈幽的手機是真的能用的。看訊息、上網、搜尋，都是解謎的一部分。<br>🔀 你的選擇會改變結局。</div>
+  <div class="rules">🕯 你有 <b>5 個靈魂</b>。<b>每答錯一次</b>、被抓到、做錯選擇都會失去靈魂。<br>💭 小羽的提示只給大方向，不會直接說答案。<b>每問一次提示就失去 1 個靈魂</b>。<br>☠ 靈魂用完可以復活，但時間 <b>+10 分鐘</b>。<br>⏱ 建議遊玩時間 <b>200 分鐘</b>，請慢慢玩。<br>☠ 但超過 <b>600 分鐘</b>，一切就會重置。<br>📱 這是一場 ARG：慈幽的手機是真的能用的。看訊息、上網、搜尋，都是解謎的一部分。<br>🔀 你的選擇會改變結局。</div>
   <div id="endc"></div>
   <button class="btn-red big" id="bNew">踏入校門</button>
   <div id="ctw"><button id="bCont">▶ 繼續遊戲</button><button id="bDel">刪除存檔</button></div><div class="row" style="margin:0"><button id="bGal">📖 結局圖鑑</button><button id="bChap">⏩ 章節選擇：第六部分</button></div>
@@ -381,9 +381,9 @@ function revive(){S.t+=600;S.soul=MAXSOUL;S.on=1;busy=0;sel=null;tapR=null;show(
  msg(`（慈幽喘著氣醒了過來。時間 +10 分鐘。）`);if(SC[S.sc].again)SC[S.sc].again()}
 function retry(){const c=S.ck;if(!c){newGame(1);return}const t=S.t,rid=S.rid,d=S.deaths,h=S.hints;S=JSON.parse(JSON.stringify(c));S.ck=c;S.t=t;S.rid=rid;S.deaths=d;S.hints=h;S.soul=MAXSOUL;S.on=1;busy=0;sel=null;show('game');hud();renderInv();render();airV(.04);msg('（回到了那一刻之前。）');save(1);if(SC[S.sc].again)SC[S.sc].again()}
 
-/* 謎題紀錄：解開 / 答錯（同一題錯三次，邦瑜就會聽見） */
+/* 謎題紀錄：解開 / 答錯（每答錯一次就失去 1 個靈魂） */
 function solved(id){if(S.pz[id])return;S.pz[id]=1;toast('🔓 謎題解開（'+Object.keys(S.pz).length+'）')}
-async function wrong(id,m){S.wr[id]=(S.wr[id]||0)+1;if(S.wr[id]%3===0){await hurt('……錯太多次了。黑暗裡，有人輕輕笑了一聲。（失去 1 個靈魂）');return}if(m)msg(m)}
+async function wrong(id,m){S.wr[id]=(S.wr[id]||0)+1;await hurt((m?m+'　':'')+'……答錯了。黑暗裡，有人輕輕笑了一聲。（失去 1 個靈魂）')}
 
 /* ================= 計時選擇 / 躲藏 / 追逐 ================= */
 function timed(text,opts,ms){return new Promise(r=>panel('',`<p class="pd" style="font-size:18px;color:#e6e0d4">${text}</p><div class="tbar"><i style="animation-duration:${ms}ms"></i></div>${opts.map((o,i)=>`<button class="ch" data-i="${i}">${o}</button>`).join('')}`,(el,done)=>{const T=setTimeout(()=>{done();r(-1)},ms);el.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{clearTimeout(T);done();r(+b.dataset.i)})},{noClose:true}))}
@@ -759,7 +759,7 @@ const _render=render;render=function(){_render();const k=SCSND[S.sc]||'school',w
 <script>
 /* ================= 謎題元件 =================
    全部回傳 Promise：解開 → true；按「離開」→ false。
-   答錯呼叫 wrong(id)：同一題每錯三次失去 1 個靈魂。 */
+   答錯呼叫 wrong(id)：每答錯一次失去 1 個靈魂。 */
 function shakeEl(e){if(!e)return;e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')}
 async function miss(id,el,m){shakeEl(el);nz(.2,.4,200,1);await wrong(id,m)}
 async function win(id,done,ms=450){ding();solved(id);await sl(ms);done(true)}
@@ -2531,14 +2531,30 @@ Object.assign(HT,{
  p5_notice:'只算 11/14 以前貼的。照日期排，紅色的數字連起來。',pd_truth:'把文件上的日期對起來：申訴、輔導、班會、錄音、批示、公文。',pd_who:'誰說過「不要理」、誰簽了「不予受理」、誰發了公文、誰在廣播裡笑她？',
  pe_run1:'跑。不要停，不要回頭，不要躲。',p5_diary:'對照妳知道的日期：11/12 半夜她在論壇發文、11/13 下午第七節是班會。',p3_brk:'影響最多燈的開關在哪？',pd_frag:'先說她不想要什麼，最後才說她想聽到的那句話。',
  ad_o4:'讀起來要像一份公文：先寫「關於什麼事」。',p4_loop:'聖安的歌：哭的是人，笑的是她。',pe_fire:'只要按兩個。試試看角落。',pe_flood:'只要按一個。',pd_candle:'只要按一根。'});
+/* 提示只剩一段：太接近答案的，改寫成大方向 */
+Object.assign(HT,{
+ ag_acro:'深夜版 red_ribbon 那篇讀起來怪怪的。換個方向讀讀看。',ag_blog:'鎖住的文章，密碼跟寯志社團的那間教室有關。',ag_login:'部落格裡，寯志提過他怎麼設密碼。',
+ ag_cctv:'監視系統要登入。帳號跟「誰在看監視器」有關，密碼藏在校門口那本登記簿裡。',ag_lost:'案件編號跟某一天有關。對聖安來說，哪一天最重要？',
+ ag6_code:'「第一次」指的是妳和印潔的回憶。那個地方，跟一個時間有關。',p1_mail:'印潔說她把信箱密碼改成了一個紀念日。手機裡跟她的聊天紀錄找得到。',
+ p2_safe:'保險箱是寯志的。他留在桌上的東西裡，有一樣寫著他的個人資料。',p2_spec:'字藏在某個亮度裡。慢慢調，不要一下跳太多。',p2_pat:'牆上的油漬是被人畫過的痕跡。看清楚它的形狀。',
+ p2_wb:'白板上有一片看起來被擦過的地方。',p2_frame:'影片裡有兩個畫面，藏著教室的號碼。',p2_time:'把妳手上所有寫著時間的東西都找出來，再排一次。',
+ p3_rub:'紙上有凹痕。想想看，怎麼讓凹下去的字浮出來。',p3_hide:'有時候，什麼都不做才是對的。',pe_hide:'有時候，什麼都不做才是對的。',pd_hide:'有時候，什麼都不做才是對的。',
+ p4_hop:'跳格子上的字母，不是每一格都要讀。',p4_batt:'電池不是每顆都能用。用手電筒仔細看看它們哪裡不一樣。',p4_jig:'拼圖的形狀已經對了，問題在別的地方。看看上面的字。',
+ p4_drawer:'抽屜是照「屆」排的。她是哪一年畢業的？',p5_radio:'收音機要調到一個對這所學校很重要的數字。',p5_dark:'沖洗照片的步驟有固定順序，有些步驟一定要接在一起。',
+ p5_yjp:'印潔設密碼的習慣，妳早就知道了。',p5_wall:'把 B-13 給妳的距離想清楚，再換算成步數。',p5_key:'置物室的鑰匙要用在對的地方。選取它，看看牆上。',
+ p5_screw:'通風口的螺絲需要工具。妳身上有什麼扁扁的、硬硬的東西？',p5_iron:'密碼跟印潔最後傳給妳的那則訊息有關。',
+ pe_fire:'不是每個按鈕都要按，越少越好。',pe_flood:'不是每個閘門都要開。',pd_candle:'不是每根蠟燭都要點。',pe_quiet:'有些地方，連聲音都不能有。',
+ pe_pillar:'它在找妳。不要讓它看到。',pe_fall:'印潔需要妳。',pe_sign:'仔細看看現在的燈。',pe_lane:'數一數操場上的線。',pe_book:'櫃台的目錄卡，可以告訴妳書在哪裡。',
+ pe_honor:'每一屆的名額都一樣。',pe_trophy:'跟三年八班的班會有關。',pd_cab:'黑板上寫著她最喜歡的和弦。音名可以換成另一種寫法。',
+ pd_tape:'這卷錄音，跟她的「最後一天」有關。',pd_speed:'聲音聽起來不對。速度可能跟錄的時候不一樣。',pd_metro:'這個數字，跟她離開的時間有關。',
+ ad_o5:'想想看，她是在哪一個時刻離開的。',pd_name:'她一直想讓人記得一件事。'});
 const curPz=()=>{const sc=SC[S.sc];const ids=(typeof sc.hz==='function'?sc.hz():sc.hz)||[];return ids.find(i=>!S.pz[i])};
 $('#bHint').onclick=async()=>{if(busy)return;const who=S.f.metYu?'小羽':'？？？',id=curPz();S.hl=S.hl||{};
  if(!id)return say([S.f.metYu?['yu','「'+(SC[S.sc].hn||'這裡已經沒有要找的東西了。往下一個地方走吧。')+'」','yu-serious']:'（這裡已經沒有要找的東西了。）']);
- if(!S.hl[id]){if(!await confirmP(`要問${who}嗎？<br><b>第一段提示</b>：只告訴妳方向。<br><small>（不會失去靈魂，但時間 +3 分鐘）</small>`))return;
-  S.hl[id]=1;S.hints=(S.hints||0)+1;S.t+=180;hud();save(1);if(checkTime())return;
-  return say([S.f.metYu?['yu','「'+(HT[id]||'再仔細看看這裡。')+'」','yu-serious']:['unk','（手機跳出一則陌生訊息）「'+(HT[id]||'再仔細看看。')+'」']])}
- if(!await confirmP(`還是想不出來？<br><b>第二段提示</b>：${who}會直接告訴妳答案。<br><small>（會失去 1 個靈魂。現在有 ${S.soul} 個。）</small>`))return;
- S.hints=(S.hints||0)+1;await say([S.f.metYu?['yu','「答案是：'+(ANS[id]||HT[id])+'」','yu-serious']:['unk','（手機跳出一則陌生訊息）「'+(ANS[id]||HT[id])+'」']]);await hurt('',1)};
+ const h=HT[id]||'再仔細看看這裡。',line=t=>S.f.metYu?['yu','「'+t+'」','yu-serious']:['unk','（手機跳出一則陌生訊息）「'+t+'」'];
+ if(S.hl[id])return say(['（'+who+'之前說過的話。）',line(h)]);
+ if(!await confirmP(`要問${who}嗎？<br>${who}只會給妳<b>大方向</b>，不會直接說答案。<br><small>（會失去 1 個靈魂。現在有 ${S.soul} 個。${S.soul<=1?'<b>這是妳最後一個靈魂。</b>':''}）</small>`))return;
+ S.hl[id]=1;S.hints=(S.hints||0)+1;save(1);await say([line(h)]);await hurt('',1)};
 
 /* ---------- 聖安好感度：不顯示數字，只看她的樣子 ---------- */
 function affWord(){const a=S.aff;if(a==null)return'';return a<25?'她看妳的眼神，冷得像在看一個陌生人。':a<50?'她會偷看妳，但妳一回頭，她就移開視線。':a<75?'她走路的時候，會站得離妳很近。':a<95?'她一直抓著妳的衣角，不肯放。':'她看妳的樣子，好像妳是全世界唯一記得她的人。'}
