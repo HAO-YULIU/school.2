@@ -244,7 +244,7 @@ body.sk #game,body.sk #sc{animation:skk .09s 8}
   <div class="rules">🕯 你有 <b>5 個靈魂</b>。<b>每答錯一次</b>、被抓到、做錯選擇都會失去靈魂。<br>💭 小羽的提示只給大方向，不會直接說答案。<b>每問一次提示就失去 1 個靈魂</b>。<br>☠ 靈魂用完可以復活，但時間 <b>+10 分鐘</b>。<br>⏱ 建議遊玩時間 <b>200 分鐘</b>，請慢慢玩。<br>☠ 但超過 <b>600 分鐘</b>，一切就會重置。<br>📱 這是一場 ARG：慈幽的手機是真的能用的。看訊息、上網、搜尋，都是解謎的一部分。<br>🔀 你的選擇會改變結局。</div>
   <div id="endc"></div>
   <button class="btn-red big" id="bNew">踏入校門</button>
-  <div id="ctw"><button id="bCont">▶ 繼續遊戲</button><button id="bDel">刪除存檔</button></div><div class="row" style="margin:0"><button id="bGal">📖 結局圖鑑</button><button id="bChap">⏩ 章節選擇：第六部分</button></div>
+  <div id="ctw"><button id="bCont">▶ 繼續遊戲</button><button id="bDel">刪除存檔</button></div><div class="row" style="margin:0"><button id="bGal">📖 結局圖鑑</button><button id="bChap4">⏩ 章節選擇：第四部分</button><button id="bChap">⏩ 章節選擇：第六部分</button></div>
   <button class="btn-gold" onclick="toLobby()">← 回到夜語工作室大廳</button>
  </div>
 </div>
@@ -2579,6 +2579,36 @@ async function chapStart(){let d;try{d=JSON.parse(localStorage.getItem(CK6))}cat
  if(hasSave()&&!confirm('從章節選擇開始，會覆蓋目前的存檔，確定嗎？'))return;
  clr();S=d;S.on=1;S.rid=null;S.f.chap=1;S.ck=null;busy=0;sel=null;tapR=null;phTh=null;show('game');badge();render();airV(.04);msg('（章節選擇：第六部分。這一次的遊玩不會列入排行榜。）');save(1);await sl(400);part6()}
 
+/* ---------- 章節選擇：第四部分（遇見聖安、決定要不要讓她跟著）的存檔 ---------- */
+const CK4='qc2_v1_chap4';
+const _ckpt=ckpt;ckpt=function(){_ckpt();if(S.act==='第四部分'&&!S.f.chap&&!S.f.metSa){try{localStorage.setItem(CK4,JSON.stringify(S.ck))}catch(e){}}};
+/* 舊存檔沒有第四部分的紀錄：從第六部分的存檔，把第四、五部分做過的事情倒回去 */
+function rewindTo4(d){
+ const P4=['lamp','oldhall','oldclass','oldoffice','store','b1','b10','b11','b12','b13','iron'];
+ const pzOut=id=>/^p[45]_/.test(id)||['ag_who','ag5_post'].includes(id);
+ const notes=d.notes||[],cut=notes.findIndex(n=>n.k==='map4'),gone=cut<0?[]:notes.slice(cut).map(n=>n.k);
+ if(cut>=0)d.notes=notes.slice(0,cut);
+ const p=d.ph=d.ph||{th:{},un:{},ask:{},pics:[],recs:[],hist:[],web:{}};
+ gone.forEach(k=>{if(k.startsWith('jz_'))delete d.jz[k.slice(3)];if(k.startsWith('tr_'))delete d.tr[k.slice(3)];
+  if(k==='lost1113')delete d.pz.ag_lost;if(k==='jz_sched'){delete d.pz.ag_sched;if(p.web)delete p.web.blog1}});
+ Object.keys(d.pz).forEach(id=>{if(pzOut(id))delete d.pz[id]});
+ const pzGone=id=>!d.pz[id];['wr','hl'].forEach(k=>{if(d[k])Object.keys(d[k]).forEach(id=>{if(pzGone(id)&&(pzOut(id)||/^ag_(lost|sched)$/.test(id)))delete d[k][id]})});
+ ['metSa','saRule','light5','p5','p6','dg'].concat(P4.map(x=>'v_'+x)).forEach(k=>delete d.f[k]);
+ d.inv=(d.inv||[]).filter(k=>!['batt','oldmap','b13key','coin','devphoto','yjphone'].includes(k));
+ const trim=(th,start)=>{const t=p.th&&p.th[th];if(!t)return;const i=t.findIndex(m=>m[0]==='t'&&String(m[1]).startsWith(start));if(i>=0)t.length=i};
+ trim('b13','lostkids.org.tw/case/');trim('jz','（排程文章已發佈）');
+ p.pics=(p.pics||[]).filter(x=>x.k!=='yjdraft');
+ if(p.ask)Object.keys(p.ask).forEach(th=>{if(!d.pz[p.ask[th]]&&(pzOut(p.ask[th])||/^ag_(lost|sched)$/.test(p.ask[th])))delete p.ask[th]});
+ Object.assign(d,{sc:'stair3',view:'f',act:'第四部分',aff:null,ans:{},sp:{},c4:null,route:null,ck:null});
+ return d}
+function chap4Data(){try{const a=localStorage.getItem(CK4);if(a)return JSON.parse(a);const b=localStorage.getItem(CK6);if(b)return rewindTo4(JSON.parse(b))}catch(e){}return null}
+function hasChap4(){try{return(!!localStorage.getItem(CK4)||!!localStorage.getItem(CK6))&&Object.keys(endings()).length>0}catch(e){return false}}
+async function chap4Start(){const d=chap4Data();if(!d)return;
+ if(hasSave()&&!confirm('從章節選擇開始，會覆蓋目前的存檔，確定嗎？'))return;
+ clr();d.f.chap=1;d.ck=null;d.soul=MAXSOUL;S=d;S.on=1;S.rid=null;S.ck=JSON.parse(JSON.stringify(d));S.ck.ck=null;
+ busy=0;sel=null;tapR=null;phTh=null;show('game');badge();renderInv();render();airV(.04);
+ msg('（章節選擇：第四部分。這一次的遊玩不會列入排行榜。）');save(1);await sl(400);await card('第四部分','迷路的聖安');go('lamp')}
+
 /* ---------- 結局圖鑑 ---------- */
 const EGAL=[['e1','結局一：沒有帶聖安','最後，妳沒有牽起那隻手。'],['e2','TRUE END：最後的同行者','她說過，她最討厭被丟下。'],['e3','結局三：她還在等我','妳帶她走了。可是妳真的相信她嗎？'],['e4','結局四：她現在是我','讓別人陪著她。'],['e5','結局五：逃跑失敗','十秒，太短了。'],['e6','結局六：邦瑜真正被放下','把她的故事，全部聽完。然後……'],['eh','隱藏真結局','誰才是第二章真正的「人」？']];
 function gallery(){const e=endings();panel('結局圖鑑',`<p class="pd">已收集 <b>${Object.keys(e).length}</b> / 7</p><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">${EGAL.map(([k,t,h])=>`<div style="background:${e[k]?'#1c1626':'#0a090e'};border:1px solid ${e[k]?'#d4a85a':'#2a2636'};border-radius:10px;padding:10px;text-align:left"><svg viewBox="0 0 100 70" style="width:100%;border-radius:6px;background:#000">${e[k]?`<use href="#P-${{e1:'sa-creepy',e2:'sa-happy',e3:'sa-cold',e4:'sa-smile',e5:'by-ghost',e6:'by-calm',eh:'sa-norm'}[k]}" x="30" y="2" width="40" height="66"/>`:`<path d="M50 10c-8 0-11 7-11 14s3 11 5 13c-8 3-11 9-12 19l-2 14h40l-2-14c-1-10-4-16-12-19 2-2 5-6 5-13s-3-14-11-14Z" fill="#1a1820"/>${T(50,44,'?',22,'#3a3648')}`}</svg><b style="font-size:13px;color:${e[k]?'#d4a85a':'#666'}">${e[k]?t:'？？？'}</b><p style="font-size:12px;color:#8a8494;margin:4px 0 0">${h}</p></div>`).join('')}</div>`)}
@@ -2635,7 +2665,7 @@ $('#bMenu').onclick=()=>{if(busy)return;panel('選單',`<div class="row" style="
 /* ================= 開始 ================= */
 function ageOk(){ac();ambient();show('title');refreshTitle()}
 function ageNo(){$('#ag').innerHTML='<h1>抱歉</h1><p>未滿 18 歲，無法遊玩。</p><button class="btn-gold" onclick="toLobby()">回到大廳</button>'}
-function refreshTitle(){$('#ctw').style.display=hasSave()?'':'none';$('#bChap').style.display=hasChap()?'':'none';const e=endings(),N={e1:'一',e2:'TRUE',e3:'三',e4:'四',e5:'五',e6:'六',eh:'隱藏'};const k=Object.keys(e);$('#endc').textContent=k.length?`已收集結局 ${k.length} / 7：${k.map(x=>N[x]).join('・')}`:''}
+function refreshTitle(){$('#ctw').style.display=hasSave()?'':'none';$('#bChap').style.display=hasChap()?'':'none';$('#bChap4').style.display=hasChap4()?'':'none';const e=endings(),N={e1:'一',e2:'TRUE',e3:'三',e4:'四',e5:'五',e6:'六',eh:'隱藏'};const k=Object.keys(e);$('#endc').textContent=k.length?`已收集結局 ${k.length} / 7：${k.map(x=>N[x]).join('・')}`:''}
 function toTitle(){save(1);if(S)S.on=0;busy=0;tapR=null;closePanels();airV(0);show('title');refreshTitle()}
 async function newGame(force){if(!force&&hasSave()&&!confirm('開始新遊戲會覆蓋目前的存檔，確定嗎？'))return;clr();S=fresh();busy=0;sel=null;tapR=null;phTab='msg';phTh=null;phUrl='search.tw';
  const me=S;if(window.SD)SD.begin().then(id=>{me.rid=id;save(1)});
@@ -2643,7 +2673,7 @@ async function newGame(force){if(!force&&hasSave()&&!confirm('開始新遊戲會
 function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SK))}catch(e){}if(!d||!SC[d.sc]){clr();refreshTitle();return}
  S=d;S.on=1;busy=0;sel=null;tapR=null;phTh=null;show('game');badge();render();airV(.04);awayCheck();setTimeout(nightCheck,15000);
  if(SC[S.sc].again)SC[S.sc].again();else msg('（已讀取存檔。她，一直在等妳回來。）')}
-$('#bNew').onclick=()=>{ac();newGame()};$('#bGal').onclick=()=>gallery();$('#bChap').onclick=()=>{ac();chapStart()};$('#bCont').onclick=()=>{ac();loadGame()};$('#bDel').onclick=()=>{clr();refreshTitle()};
+$('#bNew').onclick=()=>{ac();newGame()};$('#bGal').onclick=()=>gallery();$('#bChap').onclick=()=>{ac();chapStart()};$('#bChap4').onclick=()=>{ac();chap4Start()};$('#bCont').onclick=()=>{ac();loadGame()};$('#bDel').onclick=()=>{clr();refreshTitle()};
 buildPortraits();
 $('#cast').innerHTML=[['ci-norm','慈幽'],['yj-norm','印潔'],['yu-norm','小羽'],['jz-norm','寯志'],['by-norm','邦瑜'],['sa-norm','聖安']].map(([k,n])=>`<div>${use(k)}${n}</div>`).join('');
 setTimeout(()=>{const h=document.getElementById('sd-hide');if(h&&!window.SD){h.remove();document.body.innerHTML='<div class="scr on"><h1>連線失敗</h1><p>無法確認你的角色，請重新整理，或回到大廳重新進入。</p><div class="row"><button onclick="location.reload()">重新整理</button><button onclick="location.href=LOBBY">回到大廳</button></div></div>'}},12000);
