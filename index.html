@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>千嬋高級中學：第二章｜第柒門</title>
+<title>千嬋高級中學：第二章｜夜語工作室</title>
 <style id="sd-hide">body{visibility:hidden}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
@@ -235,7 +235,7 @@ body.sk #game,body.sk #sc{animation:skk .09s 8}
 <div id="title" class="scr">
  <div class="tposter"><img src="https://umlnwzpmjxktfzjvcbts.supabase.co/storage/v1/object/public/covers/school2.jpg" alt="千嬋高級中學：第二章"></div>
  <div class="tside">
-  <div class="tbrand">第柒門　原創線上密室</div>
+  <div class="tbrand">夜語工作室　原創線上密室</div>
   <h1 class="tt">千嬋高級中學</h1>
   <div class="tchap">第二章・三天沒回訊息</div>
   <p id="who"></p>
@@ -245,7 +245,7 @@ body.sk #game,body.sk #sc{animation:skk .09s 8}
   <div id="endc"></div>
   <button class="btn-red big" id="bNew">踏入校門</button>
   <div id="ctw"><button id="bCont">▶ 繼續遊戲</button><button id="bDel">刪除存檔</button></div><div class="row" style="margin:0"><button id="bGal">📖 結局圖鑑</button><button id="bChap">⏩ 章節選擇：第六部分</button></div>
-  <button class="btn-gold" onclick="toLobby()">← 回到第柒門大廳</button>
+  <button class="btn-gold" onclick="toLobby()">← 回到夜語工作室大廳</button>
  </div>
 </div>
 
@@ -2611,7 +2611,7 @@ const _scare2=scare;scare=async function(t,big,who){if(snd&&AUDOK.scare){const a
 
 <script>
 /* 提示按鈕在 11c_features.js（兩段式） */
-$('#bMenu').onclick=()=>{if(busy)return;panel('選單',`<div class="row" style="flex-direction:column"><button id="m1">💾 存檔</button><button id="m2">${snd?'🔇 關閉音效':'🔊 開啟音效'}</button><button id="m3">回到標題</button><button id="m4" class="btn-gold">回到第柒門大廳</button></div>`,(el,done)=>{
+$('#bMenu').onclick=()=>{if(busy)return;panel('選單',`<div class="row" style="flex-direction:column"><button id="m1">💾 存檔</button><button id="m2">${snd?'🔇 關閉音效':'🔊 開啟音效'}</button><button id="m3">回到標題</button><button id="m4" class="btn-gold">回到夜語工作室大廳</button></div>`,(el,done)=>{
  el.querySelector('#m1').onclick=()=>{done();busy=0;save(1);toast('💾 已存檔')};
  el.querySelector('#m2').onclick=()=>{snd=!snd;if(drn)drn.gain.value=snd?.8:0;airV(snd?.04:0);done()};
  el.querySelector('#m3').onclick=()=>{done();toTitle()};el.querySelector('#m4').onclick=()=>{done();toLobby()}})};
@@ -2633,7 +2633,7 @@ $('#cast').innerHTML=[['ci-norm','慈幽'],['yj-norm','印潔'],['yu-norm','小�
 setTimeout(()=>{const h=document.getElementById('sd-hide');if(h&&!window.SD){h.remove();document.body.innerHTML='<div class="scr on"><h1>連線失敗</h1><p>無法確認你的角色，請重新整理，或回到大廳重新進入。</p><div class="row"><button onclick="location.reload()">重新整理</button><button onclick="location.href=LOBBY">回到大廳</button></div></div>'}},12000);
 </script>
 
-<!-- 第柒門：沒有註冊 / 沒有角色就送回大廳；記錄遊玩、通關時間、死亡、提示、結局 -->
+<!-- 夜語工作室：沒有註冊 / 沒有角色就送回大廳；記錄遊玩、通關時間、死亡、提示、結局 -->
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const LOBBY = 'https://hao-yuliu.github.io/escape-room/', SLUG = 'school2';
